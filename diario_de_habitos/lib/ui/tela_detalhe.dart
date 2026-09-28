@@ -1,26 +1,10 @@
+import 'package:diario_de_habitos/dominio/habitos.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../confirmar_exclusao.dart';
+import '../dominio/habitos_store.dart';
+import 'package:diario_de_habitos/confirmar_exclusao.dart';
 
-class Habito {
-  final String nome;
-  final String meta;
-  final IconData icone;
-  final int diasSeguidos;
-  final int realizadoHoje;
-  final int metaHoje;
-  final int percentualMes;
-  final String descricao;
-
-  Habito(
-    this.nome,
-    this.meta,
-    this.icone,
-    this.diasSeguidos,
-    this.realizadoHoje,
-    this.metaHoje,
-    this.percentualMes,
-    this.descricao,
-  );
-}
 
 class TelaDetalheHabito extends StatelessWidget {
   const TelaDetalheHabito({super.key, required this.habito});
@@ -33,7 +17,21 @@ class TelaDetalheHabito extends StatelessWidget {
     final cores = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text(habito.nome)),
+      appBar: AppBar(
+        title: Text(habito.nome),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            tooltip: 'Excluir hábito',
+            onPressed: () async {
+              final confirmou = await confirmarExclusao(context, habito);
+              if (!context.mounted || !confirmou) return;
+              context.read<HabitosStore>().remover(habito);
+              Navigator.pop(context); // volta para a lista
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -52,7 +50,7 @@ class TelaDetalheHabito extends StatelessWidget {
                   CircleAvatar(
                     radius: 28,
                     backgroundColor: cores.onPrimary,
-                    child: Image.asset('assets/imagens/copo.png', height: 35),
+                    child: Icon(habito.icone, color: cores.primary, size: 30),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -85,7 +83,6 @@ class TelaDetalheHabito extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            
             Row(
               children: [
                 //HOJE

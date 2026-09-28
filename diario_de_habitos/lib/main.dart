@@ -1,106 +1,97 @@
+import 'package:diario_de_habitos/dados/habitos_repositorio.dart';
+import 'package:diario_de_habitos/dominio/habitos_store.dart';
+import 'package:diario_de_habitos/ui/tela_detalhe.dart';
+import 'package:diario_de_habitos/ui/tela_novo_habito.dart';
 import 'package:flutter/material.dart';
-import 'tela_detalhe.dart';
+import 'package:provider/provider.dart';
+
 
 void main() {
   runApp(
-    MaterialApp(
-      theme: ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 118, 26, 67)),
-      useMaterial3: true,
+    ChangeNotifierProvider(
+      create: (_) => HabitosStore(HabitosRepositorio())..carregar(),
+      child: MaterialApp(
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color.fromARGB(255, 118, 26, 67),
+          ),
+          useMaterial3: true,
+        ),
+        home: const TelaHabitos(),
       ),
-      home: TelaHabitos(futuro: carregarHabitos()),
     ),
   );
-}
-
-Future<List<Habito>> carregarHabitos() async {
-  await Future.delayed(const Duration(seconds: 4));
-  return [
-    Habito(
-      'Beber água',
-      'Meta: 8 copos por dia',
-      Icons.local_drink,
-      12,
-      5,
-      8,
-      62,
-      'Beber água ao longo do dia ajuda a manter a concentração e o bem-estar.',
-    ),
-    Habito(
-      'Ler',
-      'Meta: 20 páginas por dia',
-      Icons.menu_book,
-      7,
-      15,
-      20,
-      75,
-      'A leitura diária ajuda a desenvolver o conhecimento e a concentração.',
-    ),
-    Habito(
-      'Caminhar',
-      'Meta: 30 minutos por dia',
-      Icons.directions_walk,
-      5,
-      20,
-      30,
-      54,
-      'Caminhar regularmente contribui para uma rotina mais ativa.',
-    ),
-    Habito(
-      'Dormir cedo',
-      'Meta: antes das 23h',
-      Icons.bedtime,
-      3,
-      1,
-      1,
-      48,
-      'Manter uma rotina de sono regular contribui para o descanso e o bem-estar.',
-    ),
-  ];
 }
 
 class TelaHabitos extends StatelessWidget {
-  const TelaHabitos({super.key, required this.futuro});
+  const TelaHabitos({super.key});
 
-  final Future<List<Habito>> futuro;
+  void _abrirNovoHabito(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const TelaNovoHabito()),
+    );
+  }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Meus Hábitos')),
+  Widget build(BuildContext context) {
+    final habitos = context.watch<HabitosStore>().habitos;
 
-    body: FutureBuilder<List<Habito>>(
-      future: futuro,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return const Center(child: Text('Não foi possível carregar'));
-        }
-        final habitos = snapshot.data!;
-        if (habitos.isEmpty) {
-          return const Center(child: Text('Nenhum hábito ainda'));
-        }
-        return ListView(
-          children: [
-            for (final h in habitos)
-              ListTile(
-                leading: Icon(h.icone),
-                title: Text(h.nome),
-                subtitle: Text(h.meta),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TelaDetalheHabito(habito: h),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Meus Hábitos')),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _abrirNovoHabito(context),
+        child: const Icon(Icons.add),
+      ),
+      body: habitos.isEmpty
+          ? const Center(child: Text('Nenhum hábito ainda'))
+          : ListView(
+              children: [
+                for (final h in habitos)
+                  Dismissible(
+                    key: ObjectKey(h),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 16),
+                      child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                  );
-                },
-              ),
-          ],
-        );
-      },
-    ),
-  );
+                    confirmDismiss: (_) => showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('Excluir hábito?'),
+                        content: Text('"${h.nome}" será removido da lista.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: const Text('Cancelar'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, true),
+                            child: const Text('Excluir'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    onDismissed: (_) =>
+                        context.read<HabitosStore>().remover(h),
+                    child: ListTile(
+                      leading: Icon(h.icone),
+                      title: Text(h.nome),
+                      subtitle: Text(h.meta),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => TelaDetalheHabito(habito: h),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            ),
+    );
+  }
 }
-
