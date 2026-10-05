@@ -1,7 +1,7 @@
 class Habito {
   final String nome;
   final String meta;
-  final String icone; // chave neutra, ex: 'check'. A interface converte em IconData.
+  final String icone; // chave neutra converte em IconData.
   final int diasSeguidos;
   final int realizadoHoje;
   final int metaHoje;
