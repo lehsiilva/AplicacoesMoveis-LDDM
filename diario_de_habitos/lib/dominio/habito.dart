@@ -1,13 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../confirmar_exclusao.dart';
-import '../dominio/habitos_store.dart';
-import 'package:diario_de_habitos/confirmar_exclusao.dart';
-
 class Habito {
   final String nome;
   final String meta;
-  final IconData icone;
+  final String icone; // chave neutra, ex: 'check'. A interface converte em IconData.
   final int diasSeguidos;
   final int realizadoHoje;
   final int metaHoje;
@@ -24,6 +18,4 @@ class Habito {
     this.percentualMes,
     this.descricao,
   );
-
- 
 }

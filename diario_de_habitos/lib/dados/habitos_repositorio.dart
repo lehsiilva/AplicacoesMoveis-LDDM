@@ -1,11 +1,4 @@
-import 'package:diario_de_habitos/dominio/habitos.dart';
-import 'package:diario_de_habitos/ui/tela_detalhe.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../confirmar_exclusao.dart';
-import '../dominio/habitos_store.dart';
-import 'package:diario_de_habitos/confirmar_exclusao.dart';
-import '../ui/tela_detalhe.dart';
+import 'package:diario_de_habitos/dominio/habito.dart';
 
 class HabitosRepositorio {
   final List<Habito> _memoria = [];
@@ -16,7 +9,7 @@ class HabitosRepositorio {
     _memoria.add(h);
   }
 
-  Future<void> remove(Habito h) async {
+  Future<void> remover(Habito h) async {
     _memoria.remove(h);
   }
 }

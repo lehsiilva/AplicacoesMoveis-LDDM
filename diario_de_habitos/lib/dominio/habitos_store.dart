@@ -1,6 +1,5 @@
 import 'package:diario_de_habitos/dados/habitos_repositorio.dart';
-import 'package:diario_de_habitos/dominio/habitos.dart';
-import 'package:diario_de_habitos/ui/tela_detalhe.dart';
+import 'package:diario_de_habitos/dominio/habito.dart';
 import 'package:flutter/foundation.dart';
 
 class HabitosStore extends ChangeNotifier {
@@ -23,7 +22,7 @@ class HabitosStore extends ChangeNotifier {
   }
 
   Future<void> remover(Habito h) async {
-    await _repo.remove(h);
+    await _repo.remover(h);
     _habitos = await _repo.carregar();
     notifyListeners();
   }

@@ -1,8 +1,7 @@
-import 'package:diario_de_habitos/dominio/habitos.dart';
+import 'package:diario_de_habitos/dominio/habito.dart';
+import 'package:diario_de_habitos/dominio/habitos_store.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../dominio/habitos_store.dart';
-import 'tela_detalhe.dart';
 
 class TelaNovoHabito extends StatefulWidget {
   const TelaNovoHabito({super.key});
@@ -38,7 +37,7 @@ class _TelaNovoHabitoState extends State<TelaNovoHabito> {
       final habito = Habito(
         _nomeController.text.trim(),
         _metaController.text.trim(),
-        Icons.check_circle_outline,
+        'check', // chave do ícone
         0, // dias seguidos
         0, // realizado hoje
         int.parse(_metaHojeController.text),
